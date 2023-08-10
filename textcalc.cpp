@@ -37,6 +37,16 @@ struct Element
     {
         return 0;
     }
+
+    virtual void print()
+    {
+        cout << "E()";
+    }
+
+    virtual void printe()
+    {
+        cout << "E()";
+    }
 };
 
 struct Resistor : Element
@@ -76,6 +86,16 @@ struct Resistor : Element
     {
         return I;
     }
+
+    void print() override
+    {
+        cout << "R(" << R << ")\n";
+    }
+
+    void printe() override
+    {
+        cout << "R(" << R << ";" << U << ";" << I << ")\n";
+    }
 };
 
 struct Lamp : Resistor
@@ -104,6 +124,16 @@ struct Lamp : Resistor
         l=this->U*this->I/W;
         if (l>1)
             R=inf;
+    }
+
+    void print() override
+    {
+        cout << "L(" << R << ";" << W << ")\n";
+    }
+
+    void printe() override
+    {
+        cout << "L(" << R << ";" << U << ";" << I << ";" << W << ";" << l << ")\n";
     }
 };
 
@@ -151,6 +181,22 @@ struct Series : Element
     {
         return v[0]->Im();
     }
+
+    void print() override
+    {
+        cout << "[\n";
+        for (Element* e : v)
+            e->print();
+        cout << "]\n";
+    }
+
+    void printe() override
+    {
+        cout << "[\n";
+        for (Element* e : v)
+            e->printe();
+        cout << "]\n";
+    }
 };
 
 struct Parallel : Element
@@ -197,8 +243,23 @@ struct Parallel : Element
             I+=e->Im();
         return I;
     }
-};
 
+    void print() override
+    {
+        cout << "{\n";
+        for (Element* e : v)
+            e->print();
+        cout << "}\n";
+    }
+
+    void printe() override
+    {
+        cout << "{\n";
+        for (Element* e : v)
+            e->printe();
+        cout << "}\n";
+    }
+};
 
 int main() {
     double Ee=1.0, nu=0.0, phi0=0.0;
@@ -214,8 +275,9 @@ int main() {
     p.push(new Resistor{7.0});
     s.push(&p);
     s.setU(Ee);
-    cout << s.Rm() << " " << s.Um() << " " << s.Im() << endl;
-    cout << (*(*s.v[3]).v[2]).Im() << endl;
+    s.printe();
+    //cout << s.Rm() << " " << s.Um() << " " << s.Im() << endl;
+    //cout << (*(*s.v[3]).v[2]).Im() << endl;
  /*   cout << (*s.v[0]).Rm() << endl;
     cout << s.Rm() << endl;
     cout << p.Rm() << endl;
