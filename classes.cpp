@@ -1,100 +1,252 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 using namespace std;
 
+int t=0;
+const double inf=1.7976931348623157E+308;
+
 struct Element
+{
+    vector<Element*> v;
+    virtual void setU(double U)
+    {
+    }
+
+    virtual void setI(double I)
+    {
+    }
+
+    virtual double Rm()
+    {
+        return 0;
+    }
+
+    virtual double Um()
+    {
+        return 0;
+    }
+
+    virtual double Im()
+    {
+        return 0;
+    }
+
+    double dphi()
+    {
+        return 0;
+    }
+};
+
+struct Resistor : Element
 {
     double R = 0.0;
     double U = 0.0;
     double I = 0.0;
-    double ν = 0.0;
-    double φ = 0.0;
-};
 
-struct CurrentSource : Element
-{
-    double ℰ = 0.0;
-    CurrentSource (double ℰ, double R)
+    Resistor (double R)
     {
-        this->ℰ = ℰ;
         this->R = R;
-        this->U = ℰ;
-        this->ν = 0.0;
-        this->φ = 0.0;
     }
-    CurrentSource (double ℰ, double R, double ν, double φ)
+
+    void setU(double U) override
+    {
+        this->U=U;
+        this->I=U/R;
+    }
+
+    void setI(double I) override
+    {
+        this->U=I*R;
+        this->I=I;
+    }
+
+    double Rm() override
+    {
+        return R;
+    }
+
+    double Um() override
+    {
+        return U;
+    }
+
+    double Im() override
+    {
+        return I;
+    }
+};
+/*
+struct Lamp : Resistor
+{
+    double W = inf;
+
+    Lamp (double R, double W)
+    {
+        this->R = R;
+        this->W = W;
+    }
+};
+
+struct CurrentSource : Resistor
+{
+    double R = 0.0;
+    double U = 0.0;
+    double I = 0.0;
+    double nu = 0.0;
+    double phi = 0.0;
+    double Ee = 0.0;
+    CurrentSource (double Ee, double R)
+    {
+        this->Ee = Ee;
+        this->R = R;
+        this->U = Ee;
+        this->nu = 0.0;
+        this->phi = 0.0;
+    }
+    CurrentSource (double Ee, double R, double nu, double phi)
         {
-            this->ℰ = ℰ;
+            this->Ee = Ee;
             this->R = R;
-            this->U = ℰ;
-            this->ν = ν;
-            this->φ = φ;
+            this->U = Ee;
+            this->nu = nu;
+            this->phi = phi;
         }
-    double rad() const override
+    double phase()
     {
-        return abs(x);
+        return 2*pi*nu*t+phi;
+    }
+
+    double u()
+    {
+        return U*sin(2*pi*nu*t+phi);
+    }
+
+    double Res()
+    {
+        return R;
     }
 };
 
-class TwoDimPoint : public Point
+*/
+struct Series : Element
 {
-public:
-    double x;
-    double y;
-    TwoDimPoint (double x, double y)
+    //vector<Element*> v;
+
+    Series ()
     {
-        this->x = x;
-        this->y = y;
+        v.resize(0);
     }
-    TwoDimPoint ()
+
+    void push(Element* e)
     {
-        this->x = 0;
-        this->y = 0;
+        v.push_back(e);
     }
-    double rad() const override
+
+    void setU(double U) override
     {
-        return sqrt(x*x+y*y);
+        double I=U/Rm();
+        setI(I);
+    }
+
+    void setI(double I) override
+    {
+        for (Element* e : v)
+            e->setI(I);
+    }
+
+    double Rm() override
+    {
+        double R=0.0;
+        for (Element* e : v)
+            R+=e->Rm();
+        return R;
+    }
+
+    double Um() override
+    {
+        double U=0.0;
+        for (Element* e : v)
+            U+=e->Um();
+        return U;
+    }
+
+    double Im() override
+    {
+        return v[0]->Im();
     }
 };
 
-class ThreeDimPoint : public Point
+struct Parallel : Element
 {
-public:
-    double x;
-    double y;
-    double z;
-    ThreeDimPoint (double x, double y, double z)
+    //vector<Element*> v;
+
+    Parallel ()
     {
-        this->x = x;
-        this->y = y;
-        this->z = z;
+        v.resize(0);
     }
-    ThreeDimPoint ()
+
+    void push(Element* e)
     {
-        this->x = 0;
-        this->y = 0;
-        this->z = 0;
+        v.push_back(e);
     }
-    double rad() const override
+
+    void setU(double U) override
     {
-        return sqrt(x*x+y*y+z*z);
+        for (Element* e : v)
+            e->setU(U);
+    }
+
+    void setI(double I) override
+    {
+        double U=I*Rm();
+        setU(U);
+    }
+
+    double Rm() override
+    {
+        double G=0.0;
+        for (Element* e : v)
+            G+=(1/e->Rm());
+        return 1/G;
+    }
+
+    double Um() override
+    {
+        return v[0]->Um();
+    }
+
+    double Im() override
+    {
+        double I=0.0;
+        for (Element* e : v)
+            I+=e->Im();
+        return I;
     }
 };
 
-void printL (const Point& l)
-{
-    cout << l.rad() << endl;
-}
 
 int main() {
-    OneDimPoint a{-3};
-    TwoDimPoint b{3, -4};
-    ThreeDimPoint c{-3, 4, -12};
-    OneDimPoint d;
-    printL(a);
-    printL(b);
-    printL(c);
-    printL(d);
+    double Ee=1.0, nu=0.0, phi0=0.0;
+    Series s;
+    Parallel p;
+
+    s.push(new Resistor{1.0});
+    s.push(new Resistor{3.0});
+    s.push(new Resistor{7.0});
+
+    p.push(new Resistor{1.0});
+    p.push(new Resistor{3.0});
+    p.push(new Resistor{7.0});
+    s.push(&p);
+    s.setU(Ee);
+    cout << s.Rm() << " " << s.Um() << " " << s.Im() << endl;
+    cout << (*(*s.v[3]).v[2]).Im() << endl;
+ /*   cout << (*s.v[0]).Rm() << endl;
+    cout << s.Rm() << endl;
+    cout << p.Rm() << endl;
+    cout << (*p.v[3]).Rm() << endl; */
+
     return 0;
 }
