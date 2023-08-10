@@ -77,63 +77,38 @@ struct Resistor : Element
         return I;
     }
 };
-/*
+
 struct Lamp : Resistor
 {
     double W = inf;
+    double l = 0.0;
 
-    Lamp (double R, double W)
+    Lamp (double R, double W) : Resistor(R)
     {
-        this->R = R;
         this->W = W;
     }
-};
 
-struct CurrentSource : Resistor
-{
-    double R = 0.0;
-    double U = 0.0;
-    double I = 0.0;
-    double nu = 0.0;
-    double phi = 0.0;
-    double Ee = 0.0;
-    CurrentSource (double Ee, double R)
+    void setU(double U) override
     {
-        this->Ee = Ee;
-        this->R = R;
-        this->U = Ee;
-        this->nu = 0.0;
-        this->phi = 0.0;
-    }
-    CurrentSource (double Ee, double R, double nu, double phi)
-        {
-            this->Ee = Ee;
-            this->R = R;
-            this->U = Ee;
-            this->nu = nu;
-            this->phi = phi;
-        }
-    double phase()
-    {
-        return 2*pi*nu*t+phi;
+        this->U=U;
+        this->I=U/R;
+        l=this->U*this->I/W;
+        if (l>1)
+            R=inf;
     }
 
-    double u()
+    void setI(double I) override
     {
-        return U*sin(2*pi*nu*t+phi);
-    }
-
-    double Res()
-    {
-        return R;
+        this->U=I*R;
+        this->I=I;
+        l=this->U*this->I/W;
+        if (l>1)
+            R=inf;
     }
 };
 
-*/
 struct Series : Element
 {
-    //vector<Element*> v;
-
     Series ()
     {
         v.resize(0);
@@ -180,8 +155,6 @@ struct Series : Element
 
 struct Parallel : Element
 {
-    //vector<Element*> v;
-
     Parallel ()
     {
         v.resize(0);
