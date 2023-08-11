@@ -1,7 +1,7 @@
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <vector>
-#include <string>
 
 using namespace std;
 
@@ -39,18 +39,18 @@ struct Element
         return 0;
     }
 
-    virtual void read()
+    virtual void read(istream &ist)
     {
     }
 
-    virtual void print()
+    virtual void print(ostream &ost)
     {
-        cout << "E()";
+        ost << "E()";
     }
 
-    virtual void printe()
+    virtual void printe(ostream &ost)
     {
-        cout << "E()";
+        ost << "E()";
     }
 };
 
@@ -92,14 +92,14 @@ struct Resistor : Element
         return I;
     }
 
-    void print() override
+    void print(ostream &ost) override
     {
-        cout << "R(" << R << ")\n";
+        ost << "R(" << R << ")\n";
     }
 
-    void printe() override
+    void printe(ostream &ost) override
     {
-        cout << "R(" << R << ";" << U << ";" << I << ")\n";
+        ost << "R(" << R << ";" << U << ";" << I << ")\n";
     }
 };
 
@@ -131,14 +131,14 @@ struct Lamp : Resistor
             R=inf;
     }
 
-    void print() override
+    void print(ostream &ost) override
     {
-        cout << "L(" << R << ";" << W << ")\n";
+        ost << "L(" << R << ";" << W << ")\n";
     }
 
-    void printe() override
+    void printe(ostream &ost) override
     {
-        cout << "L(" << R << ";" << U << ";" << I << ";" << W << ";" << l << ")\n";
+        ost << "L(" << R << ";" << U << ";" << I << ";" << W << ";" << l << ")\n";
     }
 };
 
@@ -187,22 +187,22 @@ struct Series : Element
         return v[0]->Im();
     }
 
-    void read() override;
+    void read(istream &ist) override;
 
-    void print() override
+    void print(ostream &ost) override
     {
-        cout << "[\n";
+        ost << "[\n";
         for (Element* e : v)
-            e->print();
-        cout << "]\n";
+            e->print(ost);
+        ost << "]\n";
     }
 
-    void printe() override
+    void printe(ostream &ost) override
     {
-        cout << "[\n";
+        ost << "[\n";
         for (Element* e : v)
-            e->printe();
-        cout << "]\n";
+            e->printe(ost);
+        ost << "]\n";
     }
 };
 
@@ -251,49 +251,49 @@ struct Parallel : Element
         return I;
     }
 
-    void read() override;
+    void read(istream &ist) override;
 
-    void print() override
+    void print(ostream &ost) override
     {
-        cout << "{\n";
+        ost << "{\n";
         for (Element* e : v)
-            e->print();
-        cout << "}\n";
+            e->print(ost);
+        ost << "}\n";
     }
 
-    void printe() override
+    void printe(ostream &ost) override
     {
-        cout << "{\n";
+        ost << "{\n";
         for (Element* e : v)
-            e->printe();
-        cout << "}\n";
+            e->printe(ost);
+        ost << "}\n";
     }
 };
 
-void Series::read()
+void Series::read(istream &ist)
 {
     char c;
-    cin >> c;
+    ist >> c;
     if (c=='R')
     {
         double R;
-        cin >> c;
-        cin >> R;
+        ist >> c;
+        ist >> R;
         push(new Resistor{R});
-        cin >> c;
-        read();
+        ist >> c;
+        read(ist);
     } else
     if (c=='[')
     {
         push(new Series);
-        (*v.back()).read();
-        read();
+        (*v.back()).read(ist);
+        read(ist);
     } else
     if (c=='{')
     {
         push(new Parallel);
-        (*v.back()).read();
-        read();
+        (*v.back()).read(ist);
+        read(ist);
     } else
     if (c==']')
     {
@@ -303,30 +303,30 @@ void Series::read()
 }
 
 
-void Parallel::read()
+void Parallel::read(istream &ist)
 {
     char c;
-    cin >> c;
+    ist >> c;
     if (c=='R')
     {
         double R;
-        cin >> c;
-        cin >> R;
+        ist >> c;
+        ist >> R;
         push(new Resistor{R});
-        cin >> c;
-        read();
+        ist >> c;
+        read(ist);
     } else
     if (c=='[')
     {
         push(new Series);
-        (*v.back()).read();
-        read();
+        (*v.back()).read(ist);
+        read(ist);
     } else
     if (c=='{')
     {
         push(new Parallel);
-        (*v.back()).read();
-        read();
+        (*v.back()).read(ist);
+        read(ist);
     } else
     if (c=='}')
     {
@@ -339,14 +339,17 @@ int main() {
     double Ee=1.0, nu=0.0, phi0=0.0;
     char c;
     Series s;
+    fstream f;
+    f.open("network.txt", ios::in);
 
     cin >> Ee;
-    cin >> c;
+    f >> c;
     if (c=='[')
-        s.read();
+        s.read(f);
+    f.close();
 
     s.setU(Ee);
-    s.printe();
+    s.printe(cout);
 
     return 0;
 }
