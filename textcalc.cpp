@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -36,6 +37,10 @@ struct Element
     double dphi()
     {
         return 0;
+    }
+
+    virtual void read()
+    {
     }
 
     virtual void print()
@@ -182,6 +187,8 @@ struct Series : Element
         return v[0]->Im();
     }
 
+    void read() override;
+
     void print() override
     {
         cout << "[\n";
@@ -244,6 +251,8 @@ struct Parallel : Element
         return I;
     }
 
+    void read() override;
+
     void print() override
     {
         cout << "{\n";
@@ -261,27 +270,83 @@ struct Parallel : Element
     }
 };
 
+void Series::read()
+{
+    char c;
+    cin >> c;
+    if (c=='R')
+    {
+        double R;
+        cin >> c;
+        cin >> R;
+        push(new Resistor{R});
+        cin >> c;
+        read();
+    } else
+    if (c=='[')
+    {
+        push(new Series);
+        (*v.back()).read();
+        read();
+    } else
+    if (c=='{')
+    {
+        push(new Parallel);
+        (*v.back()).read();
+        read();
+    } else
+    if (c==']')
+    {
+        return;
+    }
+    return;
+}
+
+
+void Parallel::read()
+{
+    char c;
+    cin >> c;
+    if (c=='R')
+    {
+        double R;
+        cin >> c;
+        cin >> R;
+        push(new Resistor{R});
+        cin >> c;
+        read();
+    } else
+    if (c=='[')
+    {
+        push(new Series);
+        (*v.back()).read();
+        read();
+    } else
+    if (c=='{')
+    {
+        push(new Parallel);
+        (*v.back()).read();
+        read();
+    } else
+    if (c=='}')
+    {
+        return;
+    }
+    return;
+}
+
 int main() {
     double Ee=1.0, nu=0.0, phi0=0.0;
+    char c;
     Series s;
-    Parallel p;
 
-    s.push(new Resistor{1.0});
-    s.push(new Resistor{3.0});
-    s.push(new Resistor{7.0});
+    cin >> Ee;
+    cin >> c;
+    if (c=='[')
+        s.read();
 
-    p.push(new Resistor{1.0});
-    p.push(new Resistor{3.0});
-    p.push(new Resistor{7.0});
-    s.push(&p);
     s.setU(Ee);
     s.printe();
-    //cout << s.Rm() << " " << s.Um() << " " << s.Im() << endl;
-    //cout << (*(*s.v[3]).v[2]).Im() << endl;
- /*   cout << (*s.v[0]).Rm() << endl;
-    cout << s.Rm() << endl;
-    cout << p.Rm() << endl;
-    cout << (*p.v[3]).Rm() << endl; */
 
     return 0;
 }
