@@ -11,7 +11,8 @@ CONFIG += c++17
 SOURCES += \
     classes.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    textcalc.cpp
 
 HEADERS += \
     mainwindow.h

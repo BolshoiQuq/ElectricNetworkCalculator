@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cmath>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -103,12 +104,12 @@ struct Resistor : Element
     }
 };
 
-struct Lamp : Resistor
+struct Bulb : Resistor
 {
     double W = inf;
-    double l = 0.0;
+    double b = 0.0;
 
-    Lamp (double R, double W) : Resistor(R)
+    Bulb (double R, double W) : Resistor(R)
     {
         this->W = W;
     }
@@ -117,8 +118,8 @@ struct Lamp : Resistor
     {
         this->U=U;
         this->I=U/R;
-        l=this->U*this->I/W;
-        if (l>1)
+        b=this->U*this->I/W;
+        if (b>1)
             R=inf;
     }
 
@@ -126,19 +127,19 @@ struct Lamp : Resistor
     {
         this->U=I*R;
         this->I=I;
-        l=this->U*this->I/W;
-        if (l>1)
+        b=this->U*this->I/W;
+        if (b>1)
             R=inf;
     }
 
     void print(ostream &ost) override
     {
-        ost << "L(" << R << ";" << W << ")\n";
+        ost << "B(" << R << ";" << W << ")\n";
     }
 
     void printe(ostream &ost) override
     {
-        ost << "L(" << R << ";" << U << ";" << I << ";" << W << ";" << l << ")\n";
+        ost << "B(" << R << ";" << U << ";" << I << ";" << W << ";" << b << ")\n";
     }
 };
 
@@ -340,16 +341,28 @@ int main() {
     char c;
     Series s;
     fstream f;
-    f.open("network.txt", ios::in);
+    string in, out;
 
+    cout << "Choose input file\n";
+    cin >> in;
+
+    cout << "Enter EMF\n";
     cin >> Ee;
+
+    cout << "Choose output file\n";
+    cin >> out;
+
+    f.open(in, ios::in);
     f >> c;
     if (c=='[')
         s.read(f);
     f.close();
 
     s.setU(Ee);
-    s.printe(cout);
+
+    f.open(out, ios::out);
+    s.printe(f);
+    f.close();
 
     return 0;
 }
