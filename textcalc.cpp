@@ -241,6 +241,58 @@ struct Capacitor : Resistor
     }
 };
 
+struct Inductor : Resistor
+{
+    double L = 0.0;
+
+    Inductor (double R, double L) : Resistor(R)
+    {
+        this->L = L;
+    }
+
+    void setU(complex<double> U, double nu) override
+    {
+        this->U=U;
+        this->I=U/Zq(nu);
+    }
+
+    void setU(complex<double> U) override
+    {
+        setU(U, 0);
+    }
+
+    void setI(complex<double> I, double nu) override
+    {
+        this->U=I*Zq(nu);
+        this->I=I;
+    }
+
+    void setI(complex<double> I) override
+    {
+        setI(I, 0);
+    }
+
+    double Xq(double nu)
+    {
+        return 2*pi*nu*L;
+    }
+
+    complex<double> Zq(double nu)
+    {
+        return complex<double>(Rq(), Xq(nu));
+    }
+
+    void print(ostream &ost) override
+    {
+        ost << "L(" << R << ";" << L << ")\n";
+    }
+
+    void printe(ostream &ost) override
+    {
+        ost << "L(" << R << " Ω; " << L << " H; " << U.real() << " V; " << I.real() <<" A)\n";
+    }
+};
+
 struct Series : Element
 {
     Series ()
@@ -437,6 +489,17 @@ void Series::read(istream &ist)
         ist >> c;
         read(ist);
     } else
+    if (c=='L')
+    {
+        double R, L;
+        ist >> c;
+        ist >> R;
+        ist >> c;
+        ist >> L;
+        push(new Inductor{R, L});
+        ist >> c;
+        read(ist);
+    } else
     if (c=='[')
     {
         push(new Series);
@@ -480,6 +543,17 @@ void Parallel::read(istream &ist)
         ist >> c;
         read(ist);
     } else
+    if (c=='L')
+    {
+        double R, L;
+        ist >> c;
+        ist >> R;
+        ist >> c;
+        ist >> L;
+        push(new Inductor{R, L});
+        ist >> c;
+        read(ist);
+    } else
     if (c=='[')
     {
         push(new Series);
@@ -500,29 +574,41 @@ void Parallel::read(istream &ist)
 }
 
 int main() {
-    double Ee=1.0, nu=0.0, phi0=0.0, t;
+    double Ee=100, nu=1, phi0=0.0, t=0;
     char c;
     Series s;
     fstream f;
-    string in, out;
+    string mode, in="nin.txt", out="nout.txt";
 
-    cout << "Choose input file\n";
-    cin >> in;
+    cout << "Choose mode\n";
+    cin >> mode;
+    if (mode=="custom")
+    {
+        cout << "Enter EMF\n";
+        cin >> Ee;
 
-    cout << "Enter EMF\n";
-    cin >> Ee;
+        cout << "Enter frequence\n";
+        cin >> nu;
 
-    cout << "Enter frequence\n";
-    cin >> nu;
-/*
-    cout << "Enter basic phase\n";
-    cin >> phi0;*/
+        cout << "Enter basic phase\n";
+        cin >> phi0;
 
-    cout << "Enter time\n";
-    cin >> t;
+        cout << "Enter time\n";
+        cin >> t;
 
-    cout << "Choose output file\n";
-    cin >> out;
+        cout << "Choose input file\n";
+        cin >> in;
+
+        cout << "Choose output file\n";
+        cin >> out;
+    } else
+    if (mode=="default")
+    {
+        cout << "Default parameters:\n";
+        cout << "Ee = " << Ee << "; nu = " << nu << "; phi0 = " << phi0 << "; t = " << t << ";\n";
+        cout << "Input file: " << in << ";\n";
+        cout << "Output file: " << out << ";\n";
+    }
 
     f.open(in, ios::in);
     f >> c;
