@@ -3,34 +3,55 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <complex>
 
 using namespace std;
 
 int t=0;
 const double inf=1.7976931348623157E+308;
+const double pi=3.14159265358979323846264338;
 
 struct Element
 {
     vector<Element*> v;
-    virtual void setU(double U)
+
+    virtual void setU(complex<double> U, double nu)
     {
     }
 
-    virtual void setI(double I)
+    virtual void setU(complex<double> U)
     {
     }
 
-    virtual double Rm()
+    virtual void setI(complex<double> I, double nu)
+    {
+    }
+
+    virtual void setI(complex<double> I)
+    {
+    }
+
+    virtual double Rq()
     {
         return 0;
     }
 
-    virtual double Um()
+    virtual double Xq(double nu)
     {
         return 0;
     }
 
-    virtual double Im()
+    virtual complex<double> Zq(double nu)
+    {
+        return 0;
+    }
+
+    virtual complex<double> Uq()
+    {
+        return 0;
+    }
+
+    virtual complex<double> Iq()
     {
         return 0;
     }
@@ -58,37 +79,57 @@ struct Element
 struct Resistor : Element
 {
     double R = 0.0;
-    double U = 0.0;
-    double I = 0.0;
+    complex<double> U = 0.0;
+    complex<double> I = 0.0;
 
     Resistor (double R)
     {
         this->R = R;
     }
 
-    void setU(double U) override
+    void setU(complex<double> U) override
     {
         this->U=U;
         this->I=U/R;
     }
 
-    void setI(double I) override
+    void setU(complex<double> U, double nu) override
+    {
+        setU(U);
+    }
+
+    void setI(complex<double> I) override
     {
         this->U=I*R;
         this->I=I;
     }
 
-    double Rm() override
+    void setI(complex<double> I, double nu) override
+    {
+        setI(I);
+    }
+
+    double Rq() override
     {
         return R;
     }
 
-    double Um() override
+    double Xq(double nu) override
+    {
+        return 0;
+    }
+
+    complex<double> Zq(double nu) override
+    {
+        return R;
+    }
+
+    complex<double> Uq() override
     {
         return U;
     }
 
-    double Im() override
+    complex<double> Iq() override
     {
         return I;
     }
@@ -100,11 +141,11 @@ struct Resistor : Element
 
     void printe(ostream &ost) override
     {
-        ost << "R(" << R << ";" << U << ";" << I << ")\n";
+        ost << "R(" << R << ";" << U.real() << ";" << I.real() << ")\n";
     }
 };
 
-struct Bulb : Resistor
+/*struct Bulb : Resistor
 {
     double W = inf;
     double b = 0.0;
@@ -141,6 +182,61 @@ struct Bulb : Resistor
     {
         ost << "B(" << R << ";" << U << ";" << I << ";" << W << ";" << b << ")\n";
     }
+};*/
+
+struct Capacitor : Resistor
+{
+    double C = 0.0;
+
+    Capacitor (double R, double C) : Resistor(R)
+    {
+        this->C = C;
+    }
+
+    void setU(complex<double> U) override
+    {
+        setU(U, 0);
+    }
+
+    void setU(complex<double> U, double nu) override
+    {
+        this->U=U;
+        this->I=U/Zq(nu);
+    }
+
+    void setI(complex<double> I) override
+    {
+        setI(I, 0);
+    }
+
+    void setI(complex<double> I, double nu) override
+    {
+        this->U=I*Zq(nu);
+        this->I=I;
+    }
+
+    double Xq(double nu)
+    {
+        if (nu!=0)
+            return -1/(2*pi*nu*C);
+        else
+            return -inf;
+    }
+
+    complex<double> Zq(double nu)
+    {
+        return (Rq(), Xq(nu));
+    }
+
+    void print(ostream &ost) override
+    {
+        ost << "C(" << R << ";" << C << ")\n";
+    }
+
+    void printe(ostream &ost) override
+    {
+        ost << "B(" << R << ";" << U.real() << ";" << I.real() << ";" << C << ")\n";
+    }
 };
 
 struct Series : Element
@@ -155,37 +251,63 @@ struct Series : Element
         v.push_back(e);
     }
 
-    void setU(double U) override
+    void setU(complex<double> U) override
     {
-        double I=U/Rm();
+        setU(U, 0);
+    }
+
+    void setU(complex<double> U, double nu) override
+    {
+        complex<double> I=U/Zq(nu);
         setI(I);
     }
 
-    void setI(double I) override
+    void setI(complex<double> I) override
     {
-        for (Element* e : v)
-            e->setI(I);
+        setI(I, 0);
     }
 
-    double Rm() override
+    void setI(complex<double> I, double nu) override
+    {
+        for (Element* e : v)
+            e->setI(I, nu);
+    }
+
+    double Rq() override
     {
         double R=0.0;
         for (Element* e : v)
-            R+=e->Rm();
+            R+=e->Rq();
         return R;
     }
 
-    double Um() override
+    double Xq(double nu) override
     {
-        double U=0.0;
+        double X=0.0;
         for (Element* e : v)
-            U+=e->Um();
+            X+=e->Xq(nu);
+        return X;
+    }
+
+    complex<double> Zq(double nu) override
+    {
+        complex<double> Z=0.0;
+        for (Element* e : v)
+            Z+=e->Zq(nu);
+        return Z;
+    }
+
+    complex<double> Uq() override
+    {
+        complex<double> U=0.0;
+        for (Element* e : v)
+            U+=e->Uq();
         return U;
     }
 
-    double Im() override
+    complex<double> Iq() override
     {
-        return v[0]->Im();
+        return v[0]->Iq();
     }
 
     void read(istream &ist) override;
@@ -219,36 +341,54 @@ struct Parallel : Element
         v.push_back(e);
     }
 
-    void setU(double U) override
+    void setU(complex<double> U) override
+    {
+        setU(U, 0);
+    }
+
+    void setU(complex<double> U, double nu) override
     {
         for (Element* e : v)
-            e->setU(U);
+            e->setU(U, nu);
     }
 
-    void setI(double I) override
+    void setI(complex<double> I) override
     {
-        double U=I*Rm();
-        setU(U);
+        setI(I, 0);
     }
 
-    double Rm() override
+    void setI(complex<double> I, double nu) override
+    {
+        complex<double> U=I*Zq(nu);
+        setU(U, nu);
+    }
+
+    double Rq() override
     {
         double G=0.0;
         for (Element* e : v)
-            G+=(1/e->Rm());
+            G+=(1/e->Rq());
         return 1/G;
     }
 
-    double Um() override
+    complex<double> Zq(double nu) override
     {
-        return v[0]->Um();
+        complex<double> Y=0.0;
+        for (Element* e : v)
+            Y+=(complex<double>(1, 0)/e->Zq(nu));
+        return complex<double>(1, 0)/Y;
     }
 
-    double Im() override
+    complex<double> Uq() override
     {
-        double I=0.0;
+        return v[0]->Uq();
+    }
+
+    complex<double> Iq() override
+    {
+        complex<double> I=0.0;
         for (Element* e : v)
-            I+=e->Im();
+            I+=e->Iq();
         return I;
     }
 
@@ -337,7 +477,7 @@ void Parallel::read(istream &ist)
 }
 
 int main() {
-    double Ee=1.0, nu=0.0, phi0=0.0;
+    double Ee=1.0, nu=0.0, phi0=0.0, t;
     char c;
     Series s;
     fstream f;
@@ -349,6 +489,15 @@ int main() {
     cout << "Enter EMF\n";
     cin >> Ee;
 
+    cout << "Enter frequence\n";
+    cin >> nu;
+
+    cout << "Enter basic phase\n";
+    cin >> phi0;
+
+    cout << "Enter time\n";
+    cin >> t;
+
     cout << "Choose output file\n";
     cin >> out;
 
@@ -358,7 +507,8 @@ int main() {
         s.read(f);
     f.close();
 
-    s.setU(Ee);
+    complex<double> U=Ee*exp(complex<double>(0, 1)*(2*pi*nu*t+phi0));
+    s.setU(U, nu);
 
     f.open(out, ios::out);
     s.printe(f);
