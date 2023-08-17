@@ -9,7 +9,9 @@ using namespace std;
 
 int t=0;
 const double inf=1.7976931348623157E+308;
-const double pi=3.14159265358979323846264338;
+const double pi=3.1415926E+0;
+const complex<double> i0(1,0);
+const complex<double> i(0,1);
 
 struct Element
 {
@@ -87,26 +89,26 @@ struct Resistor : Element
         this->R = R;
     }
 
-    void setU(complex<double> U) override
+    void setU(complex<double> U, double nu) override
     {
         this->U=U;
         this->I=U/R;
     }
 
-    void setU(complex<double> U, double nu) override
+    void setU(complex<double> U) override
     {
-        setU(U);
+        setU(U, 0);
     }
 
-    void setI(complex<double> I) override
+    void setI(complex<double> I, double nu) override
     {
         this->U=I*R;
         this->I=I;
     }
 
-    void setI(complex<double> I, double nu) override
+    void setI(complex<double> I) override
     {
-        setI(I);
+        setI(I, 0);
     }
 
     double Rq() override
@@ -141,7 +143,7 @@ struct Resistor : Element
 
     void printe(ostream &ost) override
     {
-        ost << "R(" << R << ";" << U.real() << ";" << I.real() << ")\n";
+        ost << "R(" << R << " Ω; " << U.real() << " V; " << I.real() << " A)\n";
     }
 };
 
@@ -193,26 +195,26 @@ struct Capacitor : Resistor
         this->C = C;
     }
 
-    void setU(complex<double> U) override
-    {
-        setU(U, 0);
-    }
-
     void setU(complex<double> U, double nu) override
     {
         this->U=U;
         this->I=U/Zq(nu);
     }
 
-    void setI(complex<double> I) override
+    void setU(complex<double> U) override
     {
-        setI(I, 0);
+        setU(U, 0);
     }
 
     void setI(complex<double> I, double nu) override
     {
         this->U=I*Zq(nu);
         this->I=I;
+    }
+
+    void setI(complex<double> I) override
+    {
+        setI(I, 0);
     }
 
     double Xq(double nu)
@@ -225,7 +227,7 @@ struct Capacitor : Resistor
 
     complex<double> Zq(double nu)
     {
-        return (Rq(), Xq(nu));
+        return complex<double>(Rq(), Xq(nu));
     }
 
     void print(ostream &ost) override
@@ -235,7 +237,7 @@ struct Capacitor : Resistor
 
     void printe(ostream &ost) override
     {
-        ost << "B(" << R << ";" << U.real() << ";" << I.real() << ";" << C << ")\n";
+        ost << "C(" << R << " Ω; " << C << " F; " << U.real() << " V; " << I.real() <<" A)\n";
     }
 };
 
@@ -251,26 +253,26 @@ struct Series : Element
         v.push_back(e);
     }
 
-    void setU(complex<double> U) override
-    {
-        setU(U, 0);
-    }
-
     void setU(complex<double> U, double nu) override
     {
         complex<double> I=U/Zq(nu);
-        setI(I);
+        setI(I, nu);
     }
 
-    void setI(complex<double> I) override
+    void setU(complex<double> U) override
     {
-        setI(I, 0);
+        setU(U, 0);
     }
 
     void setI(complex<double> I, double nu) override
     {
         for (Element* e : v)
             e->setI(I, nu);
+    }
+
+    void setI(complex<double> I) override
+    {
+        setI(I, 0);
     }
 
     double Rq() override
@@ -341,26 +343,26 @@ struct Parallel : Element
         v.push_back(e);
     }
 
-    void setU(complex<double> U) override
-    {
-        setU(U, 0);
-    }
-
     void setU(complex<double> U, double nu) override
     {
         for (Element* e : v)
             e->setU(U, nu);
     }
 
-    void setI(complex<double> I) override
+    void setU(complex<double> U) override
     {
-        setI(I, 0);
+        setU(U, 0);
     }
 
     void setI(complex<double> I, double nu) override
     {
         complex<double> U=I*Zq(nu);
         setU(U, nu);
+    }
+
+    void setI(complex<double> I) override
+    {
+        setI(I, 0);
     }
 
     double Rq() override
@@ -375,8 +377,8 @@ struct Parallel : Element
     {
         complex<double> Y=0.0;
         for (Element* e : v)
-            Y+=(complex<double>(1, 0)/e->Zq(nu));
-        return complex<double>(1, 0)/Y;
+            Y+=(i0/e->Zq(nu));
+        return i0/Y;
     }
 
     complex<double> Uq() override
@@ -424,6 +426,17 @@ void Series::read(istream &ist)
         ist >> c;
         read(ist);
     } else
+    if (c=='C')
+    {
+        double R, C;
+        ist >> c;
+        ist >> R;
+        ist >> c;
+        ist >> C;
+        push(new Capacitor{R, C});
+        ist >> c;
+        read(ist);
+    } else
     if (c=='[')
     {
         push(new Series);
@@ -443,7 +456,6 @@ void Series::read(istream &ist)
     return;
 }
 
-
 void Parallel::read(istream &ist)
 {
     char c;
@@ -454,6 +466,17 @@ void Parallel::read(istream &ist)
         ist >> c;
         ist >> R;
         push(new Resistor{R});
+        ist >> c;
+        read(ist);
+    } else
+    if (c=='C')
+    {
+        double R, C;
+        ist >> c;
+        ist >> R;
+        ist >> c;
+        ist >> C;
+        push(new Capacitor{R, C});
         ist >> c;
         read(ist);
     } else
@@ -491,9 +514,9 @@ int main() {
 
     cout << "Enter frequence\n";
     cin >> nu;
-
+/*
     cout << "Enter basic phase\n";
-    cin >> phi0;
+    cin >> phi0;*/
 
     cout << "Enter time\n";
     cin >> t;
@@ -507,7 +530,7 @@ int main() {
         s.read(f);
     f.close();
 
-    complex<double> U=Ee*exp(complex<double>(0, 1)*(2*pi*nu*t+phi0));
+    complex<double> U=Ee*exp(i*(2*pi*nu*t+phi0));
     s.setU(U, nu);
 
     f.open(out, ios::out);
