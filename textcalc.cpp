@@ -7,7 +7,6 @@
 
 using namespace std;
 
-int t=0;
 const double inf=1.7976931348623157E+308;
 const double pi=3.1415926E+0;
 const complex<double> i0(1,0);
@@ -602,6 +601,23 @@ int main() {
         cout << "Choose output file\n";
         cin >> out;
     } else
+    if (mode=="customgraph")
+    {
+        cout << "Enter EMF\n";
+        cin >> Ee;
+
+        cout << "Enter frequence\n";
+        cin >> nu;
+
+        cout << "Enter basic phase\n";
+        cin >> phi0;
+
+        cout << "Choose input file\n";
+        cin >> in;
+
+        cout << "Choose output file\n";
+        cin >> out;
+    } else
     if (mode=="default")
     {
         cout << "Default parameters:\n";
@@ -616,12 +632,30 @@ int main() {
         s.read(f);
     f.close();
 
-    complex<double> U=Ee*exp(i*(2*pi*nu*t+phi0));
-    s.setU(U, nu);
+    if (mode=="customgraph")
+    {
+        f.open(out, ios::out);
+        for (int k=0; k<100; ++k)
+        {
+            double t;
+            if (nu==0)
+                t=double(k)/100.0;
+            else
+                t=double(k)/(100.0*nu);
+            complex<double> U=Ee*exp(i*(2*pi*nu*t+phi0));
+            s.setU(U, nu);
+            s.printe(f);
+        }
+        f.close();
+    }
+    else
+    {
+        complex<double> U=Ee*exp(i*(2*pi*nu*t+phi0));
+        s.setU(U, nu);
 
-    f.open(out, ios::out);
-    s.printe(f);
-    f.close();
-
+        f.open(out, ios::out);
+        s.printe(f);
+        f.close();
+    }
     return 0;
 }
