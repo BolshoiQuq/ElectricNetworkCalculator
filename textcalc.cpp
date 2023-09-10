@@ -572,7 +572,7 @@ void Parallel::read(istream &ist)
     return;
 }
 
-int main() {
+int main11() {
     double Ee=100, nu=1, phi0=0.0, t=0;
     char c;
     Series s;

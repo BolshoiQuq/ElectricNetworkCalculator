@@ -1,6 +1,12 @@
 QT       += core gui
+QT += printsupport
+QT       += core network
+QT       += gui
+QT       += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TEMPLATE = app
 
 CONFIG += c++17
 
@@ -9,22 +15,27 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    blocks.cpp \
     main.cpp \
     mainwindow.cpp \
     textcalc.cpp
-
 HEADERS += \
-    mainwindow.h
+    blocks.h \
+    mainwindow.h  \
+    textcalc.h
 
 FORMS += \
     mainwindow.ui
 
-TRANSLATIONS += \
-    ElectricNetworkCalculator_ru_RU.ts
-CONFIG += lrelease
-CONFIG += embed_translations
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+#RESOURCES += \
+ #   ToolsBar.qrc
+
+QT -= core gui
+TEMPLATE = app
+CONFIG += console
