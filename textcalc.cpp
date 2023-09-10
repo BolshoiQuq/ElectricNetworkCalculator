@@ -75,6 +75,11 @@ struct Element
     {
         ost << "E()";
     }
+
+    virtual void printea(ostream &ost)
+    {
+        ost << "E()";
+    }
 };
 
 struct Resistor : Element
@@ -143,6 +148,11 @@ struct Resistor : Element
     void printe(ostream &ost) override
     {
         ost << "R(" << R << " Ω; " << U.real() << " V; " << I.real() << " A)\n";
+    }
+
+    void printea(ostream &ost) override
+    {
+        ost << "R(" << U.real() << ";" << I.real() << ")\n";
     }
 };
 
@@ -238,6 +248,11 @@ struct Capacitor : Resistor
     {
         ost << "C(" << R << " Ω; " << C << " F; " << U.real() << " V; " << I.real() <<" A)\n";
     }
+
+    void printea(ostream &ost) override
+    {
+        ost << "C(" << U.real() << ";" << I.real() <<")\n";
+    }
 };
 
 struct Inductor : Resistor
@@ -289,6 +304,11 @@ struct Inductor : Resistor
     void printe(ostream &ost) override
     {
         ost << "L(" << R << " Ω; " << L << " H; " << U.real() << " V; " << I.real() <<" A)\n";
+    }
+
+    void printea(ostream &ost) override
+    {
+        ost << "L(" << U.real() << ";" << I.real() <<")\n";
     }
 };
 
@@ -380,6 +400,14 @@ struct Series : Element
             e->printe(ost);
         ost << "]\n";
     }
+
+    void printea(ostream &ost) override
+    {
+        ost << "[\n";
+        for (Element* e : v)
+            e->printea(ost);
+        ost << "]\n";
+    }
 };
 
 struct Parallel : Element
@@ -460,6 +488,14 @@ struct Parallel : Element
         ost << "{\n";
         for (Element* e : v)
             e->printe(ost);
+        ost << "}\n";
+    }
+
+    void printea(ostream &ost) override
+    {
+        ost << "{\n";
+        for (Element* e : v)
+            e->printea(ost);
         ost << "}\n";
     }
 };
@@ -644,7 +680,7 @@ int main11() {
                 t=double(k)/(100.0*nu);
             complex<double> U=Ee*exp(i*(2*pi*nu*t+phi0));
             s.setU(U, nu);
-            s.printe(f);
+            s.printea(f);
         }
         f.close();
     }
