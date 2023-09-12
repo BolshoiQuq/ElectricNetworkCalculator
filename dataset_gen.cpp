@@ -4,8 +4,10 @@
 
 using namespace std;
 
+const double pi=3.14159265358979;
 
-int main() {
+int main()
+{
     int n=0, k=0;
     double U[100], I[100];
     char c;
@@ -50,15 +52,29 @@ int main() {
     }
     f.close();
 
+    double Umax=0, Imax=0;
+    for (int i=0; i<100; ++i)
+    {
+        if (abs(U[i])>Umax)
+            Umax=U[i];
+        if (abs(I[i])>Imax)
+            Imax=I[i];
+    }
+    for (int i=0; i<100; ++i)
+    {
+        U[i]/=Umax;
+        I[i]/=Imax;
+    }
+
     f.open(out, ios::out);
     for (int i=0; i<100; ++i)
     {
-        f << "[" << i << ";" << U[i] << "]\n";
+        f << 2*pi*i/100 << ";" << U[i] << "\n";
     }
     f << "------------------------\n";
     for (int i=0; i<100; ++i)
     {
-        f << "[" << i << ";" << I[i] << "]\n";
+        f << 2*pi*i/100 << ";" << I[i] << "\n";
     }
     f.close();
 
