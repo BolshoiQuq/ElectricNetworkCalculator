@@ -13,6 +13,7 @@ public:
     textcalc();
 };
 
-void main11(double E, double n, double p, double t1, std::string in1);
+void enet_calc(double Ee, double nu, double phi0, double t, std::string in);
+void enet_graph(double Ee, double nu, double phi0, int k, std::string in);
 
 #endif // TEXTCALC_H

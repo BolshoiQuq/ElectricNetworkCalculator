@@ -609,115 +609,112 @@ void Parallel::read(istream &ist)
     return;
 }
 
-void main11(double E, double n, double p, double t1, std::string in1) {
-    double Ee=E, nu=n, phi0=p, t=t1;
+void enet_calc(double Ee, double nu, double phi0, double t, std::string in) {
     char c;
     Series s;
     fstream f;
-    string mode, in2=in1, out2="nout.txt";
+    string out="nout_calc.txt";
 
-
-    f.open(in2, ios::in);
+    f.open(in, ios::in);
     f >> c;
     if (c=='[')
         s.read(f);
     f.close();
 
-    f.open(out2, ios::out);
-    for (int k=0; k<100; ++k)
+    complex<double> U=Ee*exp(i*(2*pi*nu*t+phi0));
+    s.setU(U, nu);
+
+    f.open(out, ios::out);
+    s.printe(f);
+    f.close();
+}
+
+void enet_graph(double Ee, double nu, double phi0, int k, std::string in) {
+    char c;
+    Series s;
+    fstream f;
+    string med="nmed_graph.txt";
+
+    f.open(in, ios::in);
+    f >> c;
+    if (c=='[')
+        s.read(f);
+    f.close();
+
+    f.open(med, ios::out);
+    for (int j=0; j<100; ++j)
     {
         double t;
         if (nu==0)
-            t=double(k)/100.0;
+            t=double(j)/100.0;
         else
-            t=double(k)/(100.0*nu);
+            t=double(j)/(100.0*nu);
         complex<double> U=Ee*exp(i*(2*pi*nu*t+phi0));
         s.setU(U, nu);
         s.printea(f);
     }
     f.close();
 
-
-
-
-    //
-
-    int m=0;
+    int n=0;
     double U[100], I[100];
-    string st, in3=out2, out3="nout_dataset.txt";
+    string str, out="nout_graph.txt";
 
-    f.open(in2, ios::in);
+    f.open(in, ios::in);
     while (!f.eof())
     {
-        getline(f, st);
-        m++;
+        getline(f, str);
+        ++n;
     }
-
-    std::cout << m << std::endl;
-
     f.close();
 
-
-    f.open(out3, std::ofstream::out | std::ofstream::trunc);
-    f.close();
-
-    for (int k=0; k<m; ++k)
+    f.open(med, ios::in);
+    for (int i=0; i<100; ++i)
     {
-        f.open(in3, ios::in);
-        for (int i=0; i<100; ++i)
+        for (int j=0; j<k; ++j)
+            getline(f, str);
+        f >> c;
+        if (c=='[' or c==']' or c=='{' or c=='}')
         {
-            for (int j=0; j<k; ++j)
-            {
-                getline(f, st);
-                std::cout << st << std::endl;
-            }
-            std::cout << "---\n";
+            U[i]=0;
+            I[i]=0;
+        } else
+        if (c=='R' or c=='C' or c=='L')
+        {
             f >> c;
-            if (c=='[' or c==']' or c=='{' or c=='}')
-            {
-                U[i]=0;
-                I[i]=0;
-            } else
-                if (c=='R' or c=='C' or c=='L')
-                {
-                    f >> c;
-                    f >> U[i];
-                    f >> c;
-                    f >> I[i];
-                    f >> c;
-                }
-            for (int j=0; j<m-k; ++j)
-                getline(f, st);
+            f >> U[i];
+            f >> c;
+            f >> I[i];
+            f >> c;
         }
-        f.close();
-/*
-        double Umax=0, Imax=0;
-        for (int i=0; i<100; ++i)
-        {
-            if (abs(U[i])>Umax)
-                Umax=U[i];
-            if (abs(I[i])>Imax)
-                Imax=I[i];
-        }
-        for (int i=0; i<100; ++i)
-        {
-            U[i]/=Umax;
-            I[i]/=Imax;
-        }
+        for (int j=0; j<n-k; ++j)
+            getline(f, str);
+    }
+    f.close();
+    /*
+    double Umax=0, Imax=0;
+    for (int i=0; i<100; ++i)
+    {
+        if (abs(U[i])>Umax)
+            Umax=U[i];
+        if (abs(I[i])>Imax)
+            Imax=I[i];
+    }
+    for (int i=0; i<100; ++i)
+    {
+        U[i]/=Umax;
+        I[i]/=Imax;
+    }
 */
 
-        f.open(out3, ios::app);
-        for (int i=0; i<100; ++i)
-        {
-            f << 2*pi*i/100 << ";" << U[i] << "\n";
-        }
-        f << "------------------------\n";
-        for (int i=0; i<100; ++i)
-        {
-            f << 2*pi*i/100 << ";" << I[i] << "\n";
-        }
-        f << "------------------------\n";
-        f.close();
+    f.open(out, ios::out);
+    for (int i=0; i<100; ++i)
+    {
+        f << 2*pi*i/100 << "," << U[i] << "\n";
     }
-
+    f << "------------------------\n";
+    for (int i=0; i<100; ++i)
+    {
+        f << 2*pi*i/100 << "," << I[i] << "\n";
+    }
+    f.close();
 }

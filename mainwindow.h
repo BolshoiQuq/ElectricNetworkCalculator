@@ -60,6 +60,8 @@ private slots:
 
     void on_load_button_clicked();
 
+    void on_build_graph_clicked();
+
 private:
     Ui::MainWindow* ui;
     QGraphicsScene* scene;

@@ -391,7 +391,13 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_load_button_clicked()
 {
-    main11(ui->EMF_Ampl->text().toDouble(), ui->Frequency->text().toDouble(), ui->Initial_Phase->text().toDouble(), ui->Time->text().toDouble(), "nin.txt");
+    enet_calc(ui->EMF_Ampl->text().toDouble(), ui->Frequency->text().toDouble(), ui->Initial_Phase->text().toDouble(), ui->Time->text().toDouble(), "nin.txt");
 }
 
+
+
+void MainWindow::on_build_graph_clicked()
+{
+    enet_graph(ui->EMF_Ampl->text().toDouble(), ui->Frequency->text().toDouble(), ui->Initial_Phase->text().toDouble(), ui->Elem_number->text().toInt(), "nin.txt");
+}
 
