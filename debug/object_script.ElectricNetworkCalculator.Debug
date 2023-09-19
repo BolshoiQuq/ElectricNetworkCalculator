@@ -1,0 +1,10 @@
+debug/blocks.o
+debug/main.o
+debug/mainwindow.o
+debug/myplot.o
+debug/textcalc.o
+debug/qcustomplot.o
+debug/moc_blocks.o
+debug/moc_mainwindow.o
+debug/moc_myplot.o
+debug/moc_qcustomplot.o

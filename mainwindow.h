@@ -28,17 +28,17 @@ public:
 
 private slots:
     void on_action_open_triggered();
-    void on_save_filters_clicked(QString s1,QString s2);
-    void on_push_button_clicked();
+    //void on_save_filters_clicked(QString s1,QString s2);
+    //void on_push_button_clicked();
     void on_set_button_clicked();
     //void on_close_filters_clicked();
     void on_calculate_clicked();
     void on_delete_button_clicked();
     //void on_open_filters_clicked();
-    void on_copy_button_clicked();
+    //void on_copy_button_clicked();
 
 
-    void on_filters_itemChanged(QListWidgetItem *item);
+    //void on_filters_itemChanged(QListWidgetItem *item);
 
     void settings_filter();
     void delete_item();
@@ -57,6 +57,8 @@ private slots:
     void on_save_network_clicked();
 
     void on_pushButton_clicked();
+
+    void on_load_button_clicked();
 
 private:
     Ui::MainWindow* ui;

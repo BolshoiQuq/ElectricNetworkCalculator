@@ -1,0 +1,10 @@
+release/blocks.o
+release/main.o
+release/mainwindow.o
+release/myplot.o
+release/textcalc.o
+release/qcustomplot.o
+release/moc_blocks.o
+release/moc_mainwindow.o
+release/moc_myplot.o
+release/moc_qcustomplot.o

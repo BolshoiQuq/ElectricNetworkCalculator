@@ -18,11 +18,16 @@ SOURCES += \
     blocks.cpp \
     main.cpp \
     mainwindow.cpp \
-    textcalc.cpp
+    myplot.cpp \
+    textcalc.cpp \
+    qcustomplot.cpp
+
 HEADERS += \
     blocks.h \
     mainwindow.h  \
-    textcalc.h
+    myplot.h \
+    textcalc.h \
+    qcustomplot.h
 
 FORMS += \
     mainwindow.ui

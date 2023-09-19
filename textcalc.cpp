@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <complex>
+#include <QDebug>
 
 using namespace std;
 
@@ -75,11 +76,6 @@ struct Element
     {
         ost << "E()";
     }
-
-    virtual void printea(ostream &ost)
-    {
-        ost << "E()";
-    }
 };
 
 struct Resistor : Element
@@ -148,11 +144,6 @@ struct Resistor : Element
     void printe(ostream &ost) override
     {
         ost << "R(" << R << " Ω; " << U.real() << " V; " << I.real() << " A)\n";
-    }
-
-    void printea(ostream &ost) override
-    {
-        ost << "R(" << U.real() << ";" << I.real() << ")\n";
     }
 };
 
@@ -248,11 +239,6 @@ struct Capacitor : Resistor
     {
         ost << "C(" << R << " Ω; " << C << " F; " << U.real() << " V; " << I.real() <<" A)\n";
     }
-
-    void printea(ostream &ost) override
-    {
-        ost << "C(" << U.real() << ";" << I.real() <<")\n";
-    }
 };
 
 struct Inductor : Resistor
@@ -304,11 +290,6 @@ struct Inductor : Resistor
     void printe(ostream &ost) override
     {
         ost << "L(" << R << " Ω; " << L << " H; " << U.real() << " V; " << I.real() <<" A)\n";
-    }
-
-    void printea(ostream &ost) override
-    {
-        ost << "L(" << U.real() << ";" << I.real() <<")\n";
     }
 };
 
@@ -400,14 +381,6 @@ struct Series : Element
             e->printe(ost);
         ost << "]\n";
     }
-
-    void printea(ostream &ost) override
-    {
-        ost << "[\n";
-        for (Element* e : v)
-            e->printea(ost);
-        ost << "]\n";
-    }
 };
 
 struct Parallel : Element
@@ -490,14 +463,6 @@ struct Parallel : Element
             e->printe(ost);
         ost << "}\n";
     }
-
-    void printea(ostream &ost) override
-    {
-        ost << "{\n";
-        for (Element* e : v)
-            e->printea(ost);
-        ost << "}\n";
-    }
 };
 
 void Series::read(istream &ist)
@@ -513,44 +478,44 @@ void Series::read(istream &ist)
         ist >> c;
         read(ist);
     } else
-    if (c=='C')
-    {
-        double R, C;
-        ist >> c;
-        ist >> R;
-        ist >> c;
-        ist >> C;
-        push(new Capacitor{R, C});
-        ist >> c;
-        read(ist);
-    } else
-    if (c=='L')
-    {
-        double R, L;
-        ist >> c;
-        ist >> R;
-        ist >> c;
-        ist >> L;
-        push(new Inductor{R, L});
-        ist >> c;
-        read(ist);
-    } else
-    if (c=='[')
-    {
-        push(new Series);
-        (*v.back()).read(ist);
-        read(ist);
-    } else
-    if (c=='{')
-    {
-        push(new Parallel);
-        (*v.back()).read(ist);
-        read(ist);
-    } else
-    if (c==']')
-    {
-        return;
-    }
+        if (c=='C')
+        {
+            double R, C;
+            ist >> c;
+            ist >> R;
+            ist >> c;
+            ist >> C;
+            push(new Capacitor{R, C});
+            ist >> c;
+            read(ist);
+        } else
+            if (c=='L')
+            {
+                double R, L;
+                ist >> c;
+                ist >> R;
+                ist >> c;
+                ist >> L;
+                push(new Inductor{R, L});
+                ist >> c;
+                read(ist);
+            } else
+                if (c=='[')
+                {
+                    push(new Series);
+                    (*v.back()).read(ist);
+                    read(ist);
+                } else
+                    if (c=='{')
+                    {
+                        push(new Parallel);
+                        (*v.back()).read(ist);
+                        read(ist);
+                    } else
+                        if (c==']')
+                        {
+                            return;
+                        }
     return;
 }
 
@@ -567,131 +532,151 @@ void Parallel::read(istream &ist)
         ist >> c;
         read(ist);
     } else
-    if (c=='C')
-    {
-        double R, C;
-        ist >> c;
-        ist >> R;
-        ist >> c;
-        ist >> C;
-        push(new Capacitor{R, C});
-        ist >> c;
-        read(ist);
-    } else
-    if (c=='L')
-    {
-        double R, L;
-        ist >> c;
-        ist >> R;
-        ist >> c;
-        ist >> L;
-        push(new Inductor{R, L});
-        ist >> c;
-        read(ist);
-    } else
-    if (c=='[')
-    {
-        push(new Series);
-        (*v.back()).read(ist);
-        read(ist);
-    } else
-    if (c=='{')
-    {
-        push(new Parallel);
-        (*v.back()).read(ist);
-        read(ist);
-    } else
-    if (c=='}')
-    {
-        return;
-    }
+        if (c=='C')
+        {
+            double R, C;
+            ist >> c;
+            ist >> R;
+            ist >> c;
+            ist >> C;
+            push(new Capacitor{R, C});
+            ist >> c;
+            read(ist);
+        } else
+            if (c=='L')
+            {
+                double R, L;
+                ist >> c;
+                ist >> R;
+                ist >> c;
+                ist >> L;
+                push(new Inductor{R, L});
+                ist >> c;
+                read(ist);
+            } else
+                if (c=='[')
+                {
+                    push(new Series);
+                    (*v.back()).read(ist);
+                    read(ist);
+                } else
+                    if (c=='{')
+                    {
+                        push(new Parallel);
+                        (*v.back()).read(ist);
+                        read(ist);
+                    } else
+                        if (c=='}')
+                        {
+                            return;
+                        }
     return;
 }
 
-int main11() {
-    double Ee=100, nu=1, phi0=0.0, t=0;
+void main11(double E, double n, double p, double t1, std::string in1) {
+    double Ee=E, nu=n, phi0=p, t=t1;
     char c;
     Series s;
     fstream f;
-    string mode, in="nin.txt", out="nout.txt";
+    string mode, in2=in1, out2="nout.txt";
 
-    cout << "Choose mode\n";
-    cin >> mode;
-    if (mode=="custom")
-    {
-        cout << "Enter EMF\n";
-        cin >> Ee;
 
-        cout << "Enter frequence\n";
-        cin >> nu;
-
-        cout << "Enter basic phase\n";
-        cin >> phi0;
-
-        cout << "Enter time\n";
-        cin >> t;
-
-        cout << "Choose input file\n";
-        cin >> in;
-
-        cout << "Choose output file\n";
-        cin >> out;
-    } else
-    if (mode=="customgraph")
-    {
-        cout << "Enter EMF\n";
-        cin >> Ee;
-
-        cout << "Enter frequence\n";
-        cin >> nu;
-
-        cout << "Enter basic phase\n";
-        cin >> phi0;
-
-        cout << "Choose input file\n";
-        cin >> in;
-
-        cout << "Choose output file\n";
-        cin >> out;
-    } else
-    if (mode=="default")
-    {
-        cout << "Default parameters:\n";
-        cout << "Ee = " << Ee << "; nu = " << nu << "; phi0 = " << phi0 << "; t = " << t << ";\n";
-        cout << "Input file: " << in << ";\n";
-        cout << "Output file: " << out << ";\n";
-    }
-
-    f.open(in, ios::in);
+    f.open(in2, ios::in);
     f >> c;
     if (c=='[')
         s.read(f);
     f.close();
 
-    if (mode=="customgraph")
+    f.open(out2, ios::out);
+    for (int k=0; k<100; ++k)
     {
-        f.open(out, ios::out);
-        for (int k=0; k<100; ++k)
-        {
-            double t;
-            if (nu==0)
-                t=double(k)/100.0;
-            else
-                t=double(k)/(100.0*nu);
-            complex<double> U=Ee*exp(i*(2*pi*nu*t+phi0));
-            s.setU(U, nu);
-            s.printea(f);
-        }
-        f.close();
-    }
-    else
-    {
+        double t;
+        if (nu==0)
+            t=double(k)/100.0;
+        else
+            t=double(k)/(100.0*nu);
         complex<double> U=Ee*exp(i*(2*pi*nu*t+phi0));
         s.setU(U, nu);
-
-        f.open(out, ios::out);
         s.printe(f);
+    }
+    f.close();
+
+
+
+
+    //
+
+    int m=0;
+    double U[100], I[100];
+    string st, in3=out2, out3="nout_dataset.txt";
+
+    f.open(in2, ios::in);
+    while (!f.eof())
+    {
+        getline(f, st);
+        m++;
+    }
+
+    std::cout << m << std::endl;
+
+    f.close();
+
+
+    for (int k=0; k<m; ++k)
+    {
+        f.open(in3, ios::in);
+        for (int i=0; i<100; ++i)
+        {
+            for (int j=0; j<k; ++j)
+                getline(f, st);
+            f >> c;
+            if (c=='[' or c==']' or c=='{' or c=='}')
+            {
+                U[i]=0;
+                I[i]=0;
+            } else
+                if (c=='R' or c=='C' or c=='L')
+                {
+                    f >> c;
+                    f >> U[i];
+                    f >> c;
+                    f >> I[i];
+                    f >> c;
+                }
+            for (int j=0; j<n-k; ++j)
+                getline(f, st);
+        }
+        f.close();
+
+        double Umax=0, Imax=0;
+        for (int i=0; i<100; ++i)
+        {
+            if (abs(U[i])>Umax)
+                Umax=U[i];
+            if (abs(I[i])>Imax)
+                Imax=I[i];
+        }
+        for (int i=0; i<100; ++i)
+        {
+            U[i]/=Umax;
+            I[i]/=Imax;
+        }
+
+        f.open(out3, std::ofstream::out | std::ofstream::trunc);
+        f.close();
+
+        f.open(out3, ios::app);
+        for (int i=0; i<100; ++i)
+        {
+            f << 2*pi*i/100 << ";" << U[i] << "\n";
+        }
+        f << "------------------------\n";
+        for (int i=0; i<100; ++i)
+        {
+            f << 2*pi*i/100 << ";" << I[i] << "\n";
+        }
+        f << "------------------------\n";
         f.close();
     }
-    return 0;
+
 }

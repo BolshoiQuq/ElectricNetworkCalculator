@@ -3,12 +3,15 @@
 #include "QFileDialog"
 #include <QDir>
 #include <iostream>
+#include "textcalc.h"
 
 #include <QTcpSocket>
 #include <QVariant>
 #include <QGraphicsLineItem>
 #include <QLineF>
 #include <QDialogButtonBox>
+
+#include "myplot.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -72,21 +75,9 @@ void MainWindow::on_action_open_triggered()
 }
 
 
-/*void MainWindow::on_open_filters_clicked()
-{
-    open_settings();
-}
-
-
-void MainWindow::on_close_filters_clicked()
-{
-    close_filter();
-}*/
-
-
 void MainWindow::on_calculate_clicked()
 {
-
+    //connect(ui->calculate, &on_pushButton_clicked, this, &MainWindow::ReDrawLines);
 }
 
 
@@ -108,14 +99,14 @@ void MainWindow::settings_filter()
 }
 
 
-void MainWindow::on_save_filters_clicked(QString s1, QString s2)
-{ 
+/*void MainWindow::on_save_filters_clicked(QString s1, QString s2)
+{
     m_moderation_item->set_value(s1, s2);
     qDebug() << s1 << " " << s2;
-}
+}*/
 
 
-void MainWindow::on_push_button_clicked()
+/*void MainWindow::on_push_button_clicked()
 {
     QSettings settings("Path", "\0");
     QString filePath = settings.value("Path").toString();
@@ -141,7 +132,7 @@ void MainWindow::on_push_button_clicked()
     QString label = item_list_in_order[item_list_in_order.size()-1]->get_name();
     QString result_path = item_list_in_order[item_list_in_order.size()-1]->get_values(label);
 
-}
+}*/
 
 
 void MainWindow::add_pattern_on_scene()
@@ -263,7 +254,7 @@ void MainWindow::define_order(MoveItem* item)
 }
 
 
-void MainWindow::on_filters_itemChanged(QListWidgetItem *item)
+/*void MainWindow::on_filters_itemChanged(QListWidgetItem *item)
 {
     QString itemText = item->text();
 
@@ -275,7 +266,7 @@ void MainWindow::on_filters_itemChanged(QListWidgetItem *item)
 
     qDebug() << "Value entered: " << itemText;
 }
-
+*/
 
 void MainWindow::set_selected_item(MoveItem *item)
 {
@@ -341,10 +332,10 @@ QString MainWindow::open_dialog()
 }
 
 
-void MainWindow::on_copy_button_clicked()
+/*void MainWindow::on_copy_button_clicked()
 {
     insert_copy();
-}
+}*/
 
 
 void MainWindow::insert_copy()
@@ -363,16 +354,17 @@ void MainWindow::on_save_pattern_clicked()
 void MainWindow::on_save_network_clicked()
 {
     QString file_name = QFileDialog::getSaveFileName(this, "Сохранить файл", "", "*.txt");
-        if (!file_name.isEmpty())
+    if (!file_name.isEmpty())
+    {
+        QFile file(file_name);
+        if  (file.open(QIODevice::WriteOnly | QIODevice::Text))
         {
-            QFile file(file_name);
-            if  (file.open(QIODevice::WriteOnly | QIODevice::Text))
-            {
-                QTextStream out(&file);
-                out << ui->textEdit->toPlainText();
-                file.close();
-            }
+            QTextStream out(&file);
+            out << ui->textEdit->toPlainText();
+            file.close();
         }
+    }
+
 }
 
 
@@ -389,5 +381,17 @@ void MainWindow::on_pushButton_clicked()
             file.close();
         }
     }
+    GraphWidget* plot = new GraphWidget(this);
+    plot->set_settings(file_name.toStdString());
+    plot->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
+    plot->setWindowTitle("График");
+    plot->show();
 }
+
+
+void MainWindow::on_load_button_clicked()
+{
+    main11(ui->EMF_Ampl->text().toDouble(), ui->Frequency->text().toDouble(), ui->Initial_Phase->text().toDouble(), ui->Time->text().toDouble(), "nin.txt");
+}
+
 
