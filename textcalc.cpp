@@ -76,6 +76,11 @@ struct Element
     {
         ost << "E()";
     }
+
+    virtual void printea(ostream &ost)
+    {
+        ost << "E()";
+    }
 };
 
 struct Resistor : Element
@@ -144,6 +149,11 @@ struct Resistor : Element
     void printe(ostream &ost) override
     {
         ost << "R(" << R << " Ω; " << U.real() << " V; " << I.real() << " A)\n";
+    }
+
+    void printea(ostream &ost) override
+    {
+        ost << "R(" << U.real() << ";" << I.real() << ")\n";
     }
 };
 
@@ -239,6 +249,11 @@ struct Capacitor : Resistor
     {
         ost << "C(" << R << " Ω; " << C << " F; " << U.real() << " V; " << I.real() <<" A)\n";
     }
+
+    void printea(ostream &ost) override
+    {
+        ost << "C(" << U.real() << ";" << I.real() <<")\n";
+    }
 };
 
 struct Inductor : Resistor
@@ -290,6 +305,11 @@ struct Inductor : Resistor
     void printe(ostream &ost) override
     {
         ost << "L(" << R << " Ω; " << L << " H; " << U.real() << " V; " << I.real() <<" A)\n";
+    }
+
+    void printea(ostream &ost) override
+    {
+        ost << "L(" << U.real() << ";" << I.real() <<")\n";
     }
 };
 
@@ -381,6 +401,14 @@ struct Series : Element
             e->printe(ost);
         ost << "]\n";
     }
+
+    void printea(ostream &ost) override
+    {
+        ost << "[\n";
+        for (Element* e : v)
+            e->printea(ost);
+        ost << "]\n";
+    }
 };
 
 struct Parallel : Element
@@ -461,6 +489,14 @@ struct Parallel : Element
         ost << "{\n";
         for (Element* e : v)
             e->printe(ost);
+        ost << "}\n";
+    }
+
+    void printea(ostream &ost) override
+    {
+        ost << "{\n";
+        for (Element* e : v)
+            e->printea(ost);
         ost << "}\n";
     }
 };
@@ -597,7 +633,7 @@ void main11(double E, double n, double p, double t1, std::string in1) {
             t=double(k)/(100.0*nu);
         complex<double> U=Ee*exp(i*(2*pi*nu*t+phi0));
         s.setU(U, nu);
-        s.printe(f);
+        s.printea(f);
     }
     f.close();
 
@@ -622,13 +658,20 @@ void main11(double E, double n, double p, double t1, std::string in1) {
     f.close();
 
 
+    f.open(out3, std::ofstream::out | std::ofstream::trunc);
+    f.close();
+
     for (int k=0; k<m; ++k)
     {
         f.open(in3, ios::in);
         for (int i=0; i<100; ++i)
         {
             for (int j=0; j<k; ++j)
+            {
                 getline(f, st);
+                std::cout << st << std::endl;
+            }
+            std::cout << "---\n";
             f >> c;
             if (c=='[' or c==']' or c=='{' or c=='}')
             {
@@ -643,11 +686,11 @@ void main11(double E, double n, double p, double t1, std::string in1) {
                     f >> I[i];
                     f >> c;
                 }
-            for (int j=0; j<n-k; ++j)
+            for (int j=0; j<m-k; ++j)
                 getline(f, st);
         }
         f.close();
-
+/*
         double Umax=0, Imax=0;
         for (int i=0; i<100; ++i)
         {
@@ -661,9 +704,7 @@ void main11(double E, double n, double p, double t1, std::string in1) {
             U[i]/=Umax;
             I[i]/=Imax;
         }
-
-        f.open(out3, std::ofstream::out | std::ofstream::trunc);
-        f.close();
+*/
 
         f.open(out3, ios::app);
         for (int i=0; i<100; ++i)
