@@ -398,6 +398,11 @@ void MainWindow::on_load_button_clicked()
 
 void MainWindow::on_build_graph_clicked()
 {
-    enet_graph(ui->EMF_Ampl->text().toDouble(), ui->Frequency->text().toDouble(), ui->Initial_Phase->text().toDouble(), ui->Elem_number->text().toInt(), "nin.txt");
+    std::string plt = enet_graph(ui->EMF_Ampl->text().toDouble(), ui->Frequency->text().toDouble(), ui->Initial_Phase->text().toDouble(), ui->Elem_number->text().toInt(), "nin.txt");
+    GraphWidget* plot = new GraphWidget(this);
+    plot->set_settings(plt);
+    plot->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
+    plot->setWindowTitle("График");
+    plot->show();
 }
 

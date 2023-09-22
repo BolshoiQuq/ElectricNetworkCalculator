@@ -629,7 +629,7 @@ void enet_calc(double Ee, double nu, double phi0, double t, std::string in) {
     f.close();
 }
 
-void enet_graph(double Ee, double nu, double phi0, int k, std::string in) {
+std::string enet_graph(double Ee, double nu, double phi0, int k, std::string in) {
     char c;
     Series s;
     fstream f;
@@ -709,12 +709,13 @@ void enet_graph(double Ee, double nu, double phi0, int k, std::string in) {
     f.open(out, ios::out);
     for (int i=0; i<100; ++i)
     {
-        f << 2*pi*i/100 << "," << U[i] << "\n";
+        f << 2*pi*i/100 << ";" << U[i] << "\n";
     }
     f << "------------------------\n";
-    for (int i=0; i<100; ++i)
-    {
-        f << 2*pi*i/100 << "," << I[i] << "\n";
-    }
+//    for (int i=0; i<100; ++i)
+//    {
+//        f << 2*pi*i/100 << ";" << I[i] << "\n";
+//    }
     f.close();
+    return out;
 }
