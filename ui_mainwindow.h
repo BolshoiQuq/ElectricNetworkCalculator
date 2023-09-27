@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 6.4.3
+** Created by: Qt User Interface Compiler version 6.5.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -24,6 +24,7 @@
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QTreeWidget>
@@ -53,18 +54,19 @@ public:
     QTextEdit *textEdit;
     QWidget *tab_4;
     QGridLayout *gridLayout_4;
-    QLabel *label_3;
-    QLineEdit *Frequency;
+    QLabel *label_2;
     QLabel *label_4;
     QLineEdit *Elem_number;
-    QSpacerItem *verticalSpacer;
     QPushButton *load_button;
-    QLineEdit *Time;
     QLabel *label;
-    QLineEdit *EMF_Ampl;
-    QLabel *label_2;
-    QLineEdit *Initial_Phase;
+    QTextBrowser *textBrowser;
     QLabel *label_5;
+    QLabel *label_3;
+    QLineEdit *EMF_Ampl;
+    QLineEdit *Frequency;
+    QLineEdit *Initial_Phase;
+    QLineEdit *Time;
+    QSpacerItem *verticalSpacer;
     QPushButton *build_graph;
     QWidget *tab_5;
     QGridLayout *gridLayout_3;
@@ -94,7 +96,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(1146, 631);
+        MainWindow->resize(1148, 631);
         action_open = new QAction(MainWindow);
         action_open->setObjectName("action_open");
         QIcon icon;
@@ -166,15 +168,10 @@ public:
         tab_4->setObjectName("tab_4");
         gridLayout_4 = new QGridLayout(tab_4);
         gridLayout_4->setObjectName("gridLayout_4");
-        label_3 = new QLabel(tab_4);
-        label_3->setObjectName("label_3");
+        label_2 = new QLabel(tab_4);
+        label_2->setObjectName("label_2");
 
-        gridLayout_4->addWidget(label_3, 2, 0, 1, 1);
-
-        Frequency = new QLineEdit(tab_4);
-        Frequency->setObjectName("Frequency");
-
-        gridLayout_4->addWidget(Frequency, 0, 2, 1, 1);
+        gridLayout_4->addWidget(label_2, 1, 0, 1, 1);
 
         label_4 = new QLabel(tab_4);
         label_4->setObjectName("label_4");
@@ -184,51 +181,61 @@ public:
         Elem_number = new QLineEdit(tab_4);
         Elem_number->setObjectName("Elem_number");
 
-        gridLayout_4->addWidget(Elem_number, 4, 2, 1, 1);
-
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        gridLayout_4->addItem(verticalSpacer, 7, 0, 1, 1);
+        gridLayout_4->addWidget(Elem_number, 4, 3, 1, 1);
 
         load_button = new QPushButton(tab_4);
         load_button->setObjectName("load_button");
 
-        gridLayout_4->addWidget(load_button, 5, 2, 1, 1);
-
-        Time = new QLineEdit(tab_4);
-        Time->setObjectName("Time");
-
-        gridLayout_4->addWidget(Time, 3, 2, 1, 1);
+        gridLayout_4->addWidget(load_button, 5, 3, 1, 1);
 
         label = new QLabel(tab_4);
         label->setObjectName("label");
 
         gridLayout_4->addWidget(label, 0, 0, 1, 1);
 
-        EMF_Ampl = new QLineEdit(tab_4);
-        EMF_Ampl->setObjectName("EMF_Ampl");
+        textBrowser = new QTextBrowser(tab_4);
+        textBrowser->setObjectName("textBrowser");
 
-        gridLayout_4->addWidget(EMF_Ampl, 1, 2, 1, 1);
-
-        label_2 = new QLabel(tab_4);
-        label_2->setObjectName("label_2");
-
-        gridLayout_4->addWidget(label_2, 1, 0, 1, 1);
-
-        Initial_Phase = new QLineEdit(tab_4);
-        Initial_Phase->setObjectName("Initial_Phase");
-
-        gridLayout_4->addWidget(Initial_Phase, 2, 2, 1, 1);
+        gridLayout_4->addWidget(textBrowser, 7, 3, 1, 1);
 
         label_5 = new QLabel(tab_4);
         label_5->setObjectName("label_5");
 
         gridLayout_4->addWidget(label_5, 4, 0, 1, 1);
 
+        label_3 = new QLabel(tab_4);
+        label_3->setObjectName("label_3");
+
+        gridLayout_4->addWidget(label_3, 2, 0, 1, 1);
+
+        EMF_Ampl = new QLineEdit(tab_4);
+        EMF_Ampl->setObjectName("EMF_Ampl");
+
+        gridLayout_4->addWidget(EMF_Ampl, 1, 3, 1, 1);
+
+        Frequency = new QLineEdit(tab_4);
+        Frequency->setObjectName("Frequency");
+
+        gridLayout_4->addWidget(Frequency, 0, 3, 1, 1);
+
+        Initial_Phase = new QLineEdit(tab_4);
+        Initial_Phase->setObjectName("Initial_Phase");
+
+        gridLayout_4->addWidget(Initial_Phase, 2, 3, 1, 1);
+
+        Time = new QLineEdit(tab_4);
+        Time->setObjectName("Time");
+
+        gridLayout_4->addWidget(Time, 3, 3, 1, 1);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout_4->addItem(verticalSpacer, 9, 0, 1, 1);
+
         build_graph = new QPushButton(tab_4);
         build_graph->setObjectName("build_graph");
 
-        gridLayout_4->addWidget(build_graph, 6, 2, 1, 1);
+        gridLayout_4->addWidget(build_graph, 6, 3, 1, 1);
 
         tabWidget->addTab(tab_4, QString());
         tab_5 = new QWidget();
@@ -315,7 +322,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1146, 21));
+        menubar->setGeometry(QRect(0, 0, 1148, 21));
         menuFile = new QMenu(menubar);
         menuFile->setObjectName("menuFile");
         menuEdit = new QMenu(menubar);
@@ -382,12 +389,12 @@ public:
         save_network->setText(QCoreApplication::translate("MainWindow", "Save", nullptr));
         pushButton->setText(QCoreApplication::translate("MainWindow", "Open ", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QCoreApplication::translate("MainWindow", "\320\240\320\265\320\264\320\260\320\272\321\202\320\270\321\200\320\276\320\262\320\260\320\275\320\270\320\265 \321\204\320\260\320\271\320\273\320\260", nullptr));
-        label_3->setText(QCoreApplication::translate("MainWindow", "Initial_Phase", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "EMF_Amplitude", nullptr));
         label_4->setText(QCoreApplication::translate("MainWindow", "Time", nullptr));
         load_button->setText(QCoreApplication::translate("MainWindow", "\320\240\320\260\321\201\321\201\321\207\320\270\321\202\320\260\321\202\321\214", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "Frequency", nullptr));
-        label_2->setText(QCoreApplication::translate("MainWindow", "EMF_Amplitude", nullptr));
         label_5->setText(QCoreApplication::translate("MainWindow", "Elem_number", nullptr));
+        label_3->setText(QCoreApplication::translate("MainWindow", "Initial_Phase", nullptr));
         build_graph->setText(QCoreApplication::translate("MainWindow", "\320\237\320\276\321\201\321\202\321\200\320\276\320\270\321\202\321\214 \320\263\321\200\320\260\321\204\320\270\320\272", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_4), QCoreApplication::translate("MainWindow", "\320\240\320\260\321\201\321\207\321\221\321\202", nullptr));
         delete_button->setText(QCoreApplication::translate("MainWindow", "\320\243\320\264\320\260\320\273\320\270\321\202\321\214", nullptr));

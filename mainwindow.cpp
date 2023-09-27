@@ -381,28 +381,40 @@ void MainWindow::on_pushButton_clicked()
             file.close();
         }
     }
-    GraphWidget* plot = new GraphWidget(this);
-    plot->set_settings(file_name.toStdString());
-    plot->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
-    plot->setWindowTitle("График");
-    plot->show();
 }
 
 
 void MainWindow::on_load_button_clicked()
 {
     enet_calc(ui->EMF_Ampl->text().toDouble(), ui->Frequency->text().toDouble(), ui->Initial_Phase->text().toDouble(), ui->Time->text().toDouble(), "nin.txt");
+    QString file_name = "nout_calc.txt";
+        if (!file_name.isEmpty())
+        {
+            QFile file(file_name);
+            if  (file.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                QTextStream in(&file);
+                ui->textBrowser->setPlainText(in.readAll());
+                file.close();
+            }
+        }
 }
-
-
 
 void MainWindow::on_build_graph_clicked()
 {
-    std::string plt = enet_graph(ui->EMF_Ampl->text().toDouble(), ui->Frequency->text().toDouble(), ui->Initial_Phase->text().toDouble(), ui->Elem_number->text().toInt(), "nin.txt");
-    GraphWidget* plot = new GraphWidget(this);
-    plot->set_settings(plt);
-    plot->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
-    plot->setWindowTitle("График");
-    plot->show();
+    enet_graph(ui->EMF_Ampl->text().toDouble(), ui->Frequency->text().toDouble(), ui->Initial_Phase->text().toDouble(), ui->Elem_number->text().toInt(), "nin.txt");
+    std::string plt_U = "nout_graph_U.txt";
+    GraphWidget* plot_U = new GraphWidget(this);
+    plot_U->set_settings(plt_U);
+    plot_U->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint);
+    plot_U->setWindowTitle("График U(t)");
+    plot_U->show();
+
+    std::string plt_I = "nout_graph_I.txt";
+    GraphWidget* plot_I = new GraphWidget(this);
+    plot_I->set_settings(plt_I);
+    plot_I->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint);
+    plot_I->setWindowTitle("График I(t)");
+    plot_I->show();
 }
 
