@@ -629,7 +629,7 @@ void enet_calc(double Ee, double nu, double phi0, double t, std::string in) {
     f.close();
 }
 
-std::string enet_graph(double Ee, double nu, double phi0, int k, std::string in) {
+void enet_graph(double Ee, double nu, double phi0, int k, std::string in) {
     char c;
     Series s;
     fstream f;
@@ -657,7 +657,7 @@ std::string enet_graph(double Ee, double nu, double phi0, int k, std::string in)
 
     int n=0;
     double U[100], I[100];
-    string str, out="nout_graph.txt";
+    string str, out_U="nout_graph_U.txt", out_I="nout_graph_I.txt";
 
     f.open(in, ios::in);
     while (!f.eof())
@@ -706,16 +706,26 @@ std::string enet_graph(double Ee, double nu, double phi0, int k, std::string in)
     }
 */
 
-    f.open(out, ios::out);
+    f.open(out_U, ios::out);
     for (int i=0; i<100; ++i)
     {
-        f << 2*pi*i/100 << ";" << U[i] << "\n";
+        if (nu==0)
+            f << double(i)/100.0 << ";" << U[i] << "\n";
+        else
+            f << double(i)/(100.0*nu) << ";" << U[i] << "\n";
     }
     f << "------------------------\n";
-//    for (int i=0; i<100; ++i)
-//    {
-//        f << 2*pi*i/100 << ";" << I[i] << "\n";
-//    }
     f.close();
-    return out;
+
+
+    f.open(out_I, ios::out);
+    for (int i=0; i<100; ++i)
+    {
+        if (nu==0)
+            f << double(i)/100.0 << ";" << I[i] << "\n";
+        else
+            f << double(i)/(100.0*nu) << ";" << I[i] << "\n";
+    }
+    f << "------------------------\n";
+    f.close();
 }
