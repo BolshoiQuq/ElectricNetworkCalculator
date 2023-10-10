@@ -67,6 +67,7 @@ void GraphWidget::set_settings(std::string fpath)
     layout->addWidget(button);
 
 
+
     // Создаем график
     QCPGraph* graph = m_plot->addGraph();
 
